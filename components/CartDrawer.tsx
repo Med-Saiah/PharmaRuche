@@ -20,13 +20,19 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose, cart, updateQu
   const total = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
 
   const handleSubmit = async () => {
+    if (!isValid || cart.length === 0) return;
+
     setLoading(true);
     await new Promise(r => setTimeout(r, 1200));
     onPlaceOrder(formData);
+    setFormData({ name: '', phone: '', wilaya: WILAYAS[15], address: '' });
     setLoading(false);
   };
 
-  const isValid = formData.name.length > 2 && formData.phone.length > 8 && formData.address.length > 5;
+  const isValid =
+    formData.name.trim().length > 1 &&
+    formData.phone.trim().length >= 6 &&
+    formData.address.trim().length > 4;
 
   if (!isOpen) return null;
 
