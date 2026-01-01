@@ -12,11 +12,19 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ isOpen, onClose, onSuccess, t }
   const [pass, setPass] = useState('');
   const [error, setError] = useState(false);
 
-  if (!isOpen) return null;
+  if (!isOpen) {
+    return null;
+  }
+
+  const handleClose = () => {
+    setPass('');
+    setError(false);
+    onClose();
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (pass === 'admin123') { 
+    if (pass === 'admin123') {
       onSuccess();
       setPass('');
     } else {
@@ -26,7 +34,7 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ isOpen, onClose, onSuccess, t }
 
   return (
     <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-xl animate-in fade-in" onClick={onClose}></div>
+      <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-xl animate-in fade-in" onClick={handleClose}></div>
       <form onSubmit={handleSubmit} className="relative bg-white w-full max-w-md p-10 rounded-[3rem] shadow-2xl space-y-8 animate-in zoom-in-95">
         <div className="text-center">
           <div className="w-20 h-20 bg-amber-50 text-amber-600 rounded-3xl flex items-center justify-center text-4xl mx-auto mb-6 shadow-sm">

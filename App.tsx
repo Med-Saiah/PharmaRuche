@@ -24,6 +24,7 @@ const App: React.FC = () => {
   const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isSuccessOpen, setIsSuccessOpen] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
 
   // Load Data
   useEffect(() => {
@@ -36,15 +37,18 @@ const App: React.FC = () => {
       if (savedProducts) setProducts(JSON.parse(savedProducts));
     } catch (e) {
       console.error("Storage Error", e);
+    } finally {
+      setHydrated(true);
     }
   }, []);
 
   // Save Data
   useEffect(() => {
+    if (!hydrated) return;
     localStorage.setItem('pharma_cart', JSON.stringify(cart));
     localStorage.setItem('pharma_orders', JSON.stringify(orders));
     localStorage.setItem('pharma_products', JSON.stringify(products));
-  }, [cart, orders, products]);
+  }, [cart, orders, products, hydrated]);
 
   // RTL/LTR Handling
   useEffect(() => {
@@ -79,15 +83,21 @@ const App: React.FC = () => {
   };
 
   const placeOrder = (customerDetails: { name: string; phone: string; wilaya: string; address: string }) => {
-    const cleanName = customerDetails.name.replace(/[^a-zA-Z0-9 \u0600-\u06FF]/g, ""); 
-    
+    if (cart.length === 0) return;
+
+    const cleanName = customerDetails.name.trim();
+    const cleanPhone = customerDetails.phone.trim();
+    const cleanAddress = customerDetails.address.trim();
+
+    if (!cleanName || !cleanPhone || !cleanAddress) return;
+
     const total = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
     const newOrder: Order = {
       id: Math.random().toString(36).substr(2, 6).toUpperCase(),
       customerName: cleanName,
-      phone: customerDetails.phone,
+      phone: cleanPhone,
       wilaya: customerDetails.wilaya,
-      address: customerDetails.address,
+      address: cleanAddress,
       items: [...cart],
       total,
       status: 'pending',
