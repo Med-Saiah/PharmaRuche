@@ -1,5 +1,7 @@
 
 import React, { useState } from 'react';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../firebase';
 
 interface AdminLoginProps {
   isOpen: boolean;
@@ -9,58 +11,109 @@ interface AdminLoginProps {
 }
 
 const AdminLogin: React.FC<AdminLoginProps> = ({ isOpen, onClose, onSuccess, t }) => {
-  const [pass, setPass] = useState('');
-  const [error, setError] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   if (!isOpen) {
     return null;
   }
 
   const handleClose = () => {
-    setPass('');
-    setError(false);
+    setEmail('');
+    setPassword('');
+    setError('');
     onClose();
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (pass === 'admin123') {
+    setError('');
+    setIsLoading(true);
+
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
       onSuccess();
-      setPass('');
-    } else {
-      setError(true);
+      setEmail('');
+      setPassword('');
+    } catch (err: any) {
+      console.error('Login error:', err);
+      if (err.code === 'auth/invalid-credential' || err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found') {
+        setError('Invalid email or password');
+      } else if (err.code === 'auth/too-many-requests') {
+        setError('Too many failed attempts. Please try again later.');
+      } else {
+        setError('Login failed. Please try again.');
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-xl animate-in fade-in" onClick={handleClose}></div>
-      <form onSubmit={handleSubmit} className="relative bg-white w-full max-w-md p-10 rounded-[3rem] shadow-2xl space-y-8 animate-in zoom-in-95">
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-zinc-900/50 backdrop-blur-sm">
+      <div className="absolute inset-0" onClick={handleClose}></div>
+      <form onSubmit={handleSubmit} className="relative bg-white w-full max-w-md p-10 rounded-3xl shadow-2xl space-y-6 animate-in zoom-in-95">
         <div className="text-center">
-          <div className="w-20 h-20 bg-amber-50 text-amber-600 rounded-3xl flex items-center justify-center text-4xl mx-auto mb-6 shadow-sm">
+          <div className="w-24 h-24 bg-gradient-to-br from-[#d97706] to-amber-600 rounded-2xl flex items-center justify-center text-5xl mx-auto mb-6 shadow-lg">
              🔐
           </div>
-          <h2 className="text-3xl font-black text-slate-900">{t('admin_panel')}</h2>
-          <p className="text-slate-400 text-sm mt-2 font-bold uppercase tracking-widest">Restricted Access</p>
+          <h2 className="text-3xl font-bold text-zinc-900">{t('admin_panel')}</h2>
+          <p className="text-zinc-500 text-sm mt-2 font-semibold uppercase tracking-widest">Secure Access Required</p>
         </div>
         
-        <div className="space-y-2">
-          <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-2">{t('password')}</label>
+        <div className="space-y-3">
+          <label className="block text-sm font-bold text-zinc-700 px-1">📧 Email</label>
           <input 
-            type="password" 
+            type="email" 
             autoFocus
-            className={`w-full p-5 rounded-2xl border-2 outline-none transition-all font-bold text-center tracking-widest ${error ? 'border-red-500 bg-red-50 animate-shake' : 'border-slate-100 bg-slate-50 focus:border-amber-500 focus:bg-white'}`}
+            required
+            className="w-full px-6 py-3 rounded-xl border-2 font-semibold placeholder-zinc-400 outline-none transition-all duration-300 border-zinc-200 bg-zinc-50 focus:border-[#d97706] focus:bg-white focus:ring-2 focus:ring-amber-200"
+            placeholder="admin@pharmaruche.com"
+            value={email}
+            onChange={(e) => { setEmail(e.target.value); setError(''); }}
+            disabled={isLoading}
+          />
+        </div>
+
+        <div className="space-y-3">
+          <label className="block text-sm font-bold text-zinc-700 px-1">🔑 {t('password')}</label>
+          <input 
+            type="password"
+            required
+            className={`w-full px-6 py-3 rounded-xl border-2 font-semibold text-center tracking-widest placeholder-zinc-400 outline-none transition-all duration-300 ${error ? 'border-red-400 bg-red-50 animate-shake focus:border-red-500 focus:ring-2 focus:ring-red-200' : 'border-zinc-200 bg-zinc-50 focus:border-[#d97706] focus:bg-white focus:ring-2 focus:ring-amber-200'}`}
             placeholder="••••••••"
-            value={pass}
-            onChange={(e) => { setPass(e.target.value); setError(false); }}
+            value={password}
+            onChange={(e) => { setPassword(e.target.value); setError(''); }}
+            disabled={isLoading}
           />
         </div>
         
-        {error && <p className="text-red-500 text-xs text-center font-black animate-in slide-in-from-top-1">Invalid credentials. Please try again.</p>}
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-xl p-3 animate-in slide-in-from-top-2">
+            <p className="text-red-600 text-sm font-semibold flex items-center gap-2">
+              ❌ {error}
+            </p>
+          </div>
+        )}
 
-        <button type="submit" className="w-full bg-slate-900 hover:bg-slate-800 text-white font-black py-5 rounded-2xl shadow-xl transition-all transform active:scale-95 flex items-center justify-center gap-3">
-          <span>{t('login')}</span>
-          <span className="text-xl">🚀</span>
+        <button 
+          type="submit" 
+          disabled={isLoading}
+          className="w-full bg-gradient-to-r from-[#d97706] to-amber-600 hover:from-[#c27105] hover:to-amber-700 text-white font-black py-4 rounded-xl shadow-lg transition-all transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+        >
+          {isLoading ? (
+            <>
+              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              <span>Signing in...</span>
+            </>
+          ) : (
+            <>
+              <span>{t('login')}</span>
+              <span className="text-xl">🚀</span>
+            </>
+          )}
         </button>
       </form>
 

@@ -4,7 +4,22 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Pharma Ruche | Nature & Science</title>
+    
+    <!-- SEO Meta Tags -->
+    <title>Pharma Ruche - مناحل أسامة الصغير | عسل طبيعي 100%</title>
+    <meta name="description" content="عسل طبيعي من الجزائر. Miel naturel d'Algérie. Découvrez nos produits de la ruche: miel, pollen, gelée royale, propolis. 100% naturel et authentique." />
+    <meta name="keywords" content="عسل, miel, honey, algérie, naturel, pollen, gelée royale, propolis, مناحل, pharma ruche" />
+    <meta name="author" content="Pharma Ruche" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Pharma Ruche - مناحل أسامة الصغير" />
+    <meta property="og:description" content="Miel naturel 100% d'Algérie - Produits de la ruche authentiques" />
+    <meta property="og:image" content="/logo.png" />
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/logo.png" />
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet">
     <style>
@@ -37,6 +52,9 @@
       ::-webkit-scrollbar { width: 6px; }
       ::-webkit-scrollbar-track { background: #f8fafc; }
       ::-webkit-scrollbar-thumb { background: #064e3b; border-radius: 10px; }
+      html {
+        scroll-behavior: smooth;
+      }
     </style>
   <script type="importmap">
 {
@@ -52,5 +70,22 @@
   <body class="text-zinc-900 overflow-x-hidden honeycomb-pattern">
     <div id="root"></div>
   <script type="module" src="/index.tsx"></script>
+  <script>
+    // Smooth scroll for all anchor links
+    document.addEventListener('click', function(event) {
+      const target = event.target.closest('a[href^="#"]');
+      if (target) {
+        event.preventDefault();
+        const id = target.getAttribute('href').substring(1);
+        const element = document.getElementById(id);
+        if (element) {
+          element.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+      }
+    });
+  </script>
 </body>
 </html>

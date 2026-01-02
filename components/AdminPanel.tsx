@@ -57,82 +57,82 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ orders, products, feedbacks, on
   const averageRating = feedbacks.length === 0 ? 0 : (feedbacks.reduce((sum, fb) => sum + fb.rating, 0) / feedbacks.length);
 
   return (
-    <div className="min-h-screen bg-[#f3f4f6] font-montserrat text-zinc-900 pb-20">
+    <div className="min-h-screen bg-gradient-to-br from-zinc-50 via-white to-zinc-50 font-montserrat text-zinc-900 pb-20">
       
       {/* Top Navigation Bar - Professional & Stable */}
-      <nav className="bg-zinc-900 text-white shadow-lg sticky top-0 z-30">
+      <nav className="bg-white text-zinc-900 shadow-md border-b border-zinc-100 sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-4 md:px-8">
           <div className="flex justify-between items-center h-20">
             <div className="flex items-center gap-8">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-[#d97706] rounded-xl flex items-center justify-center font-black shadow-lg shadow-amber-900/50">PR</div>
-                <div className="hidden md:block">
-                  <span className="block font-bold leading-none">Admin</span>
-                  <span className="text-[10px] text-zinc-400 uppercase tracking-widest">Manager</span>
+                <img src="/logo.png" alt="Pharma Ruche" className="h-12 w-auto" />
+                <div className="hidden md:block border-l border-zinc-200 pl-4">
+                  <span className="block font-bold leading-none text-zinc-900">Admin Panel</span>
+                  <span className="text-[9px] text-zinc-500 uppercase tracking-widest">Dashboard</span>
                 </div>
               </div>
               
-              <div className="hidden md:flex gap-1 bg-zinc-800/50 p-1 rounded-lg">
+              <div className="hidden md:flex gap-2 bg-zinc-100 p-1.5 rounded-lg">
                 <button 
                   onClick={() => setView('dashboard')}
-                  className={`px-6 py-2 rounded-md text-xs font-bold uppercase tracking-widest transition-all ${view === 'dashboard' ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-400 hover:text-white hover:bg-zinc-800'}`}
+                  className={`px-6 py-2 rounded-lg text-xs font-bold uppercase tracking-widest transition-all ${view === 'dashboard' ? 'bg-[#d97706] text-white shadow-md' : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-200'}`}
                 >
-                  {t('dashboard')}
+                  📊 {t('dashboard')}
                 </button>
                 <button 
                   onClick={() => setView('products')}
-                  className={`px-6 py-2 rounded-md text-xs font-bold uppercase tracking-widest transition-all ${view === 'products' ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-400 hover:text-white hover:bg-zinc-800'}`}
+                  className={`px-6 py-2 rounded-lg text-xs font-bold uppercase tracking-widest transition-all ${view === 'products' ? 'bg-[#d97706] text-white shadow-md' : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-200'}`}
                 >
-                  {t('inventory')}
+                  📦 {t('inventory')}
                 </button>
               </div>
             </div>
 
             <div className="flex items-center gap-4">
-              <a href="/" className="text-zinc-400 hover:text-white text-sm font-bold transition-colors hidden sm:block">
-                {t('back_to_shop')}
+              <a href="/" className="text-zinc-600 hover:text-[#d97706] text-sm font-bold transition-colors hidden sm:block border-r border-zinc-200 pr-4">
+                ← {t('back_to_shop')}
               </a>
-              <button onClick={onLogout} className="bg-red-600 hover:bg-red-500 text-white px-5 py-2 rounded-lg text-xs font-bold uppercase tracking-widest transition-colors shadow-lg shadow-red-900/20">
-                Log Out
+              <button onClick={onLogout} className="bg-red-600 hover:bg-red-700 text-white px-6 py-2.5 rounded-lg text-xs font-bold uppercase tracking-widest transition-all shadow-md">
+                🚪 Logout
               </button>
             </div>
           </div>
           
           {/* Mobile Tabs */}
-          <div className="flex md:hidden gap-1 pb-4">
+          <div className="flex md:hidden gap-2 pb-4 pt-4 border-t border-zinc-100">
              <button 
                   onClick={() => setView('dashboard')}
-                  className={`flex-1 py-3 rounded-lg text-xs font-bold uppercase tracking-widest transition-all ${view === 'dashboard' ? 'bg-white text-zinc-900' : 'bg-zinc-800 text-zinc-400'}`}
+                  className={`flex-1 py-3 rounded-lg text-xs font-bold uppercase tracking-widest transition-all ${view === 'dashboard' ? 'bg-[#d97706] text-white shadow-md' : 'bg-zinc-100 text-zinc-600'}`}
                 >
-                  {t('dashboard')}
+                  📊 {t('dashboard')}
               </button>
               <button 
                   onClick={() => setView('products')}
-                  className={`flex-1 py-3 rounded-lg text-xs font-bold uppercase tracking-widest transition-all ${view === 'products' ? 'bg-white text-zinc-900' : 'bg-zinc-800 text-zinc-400'}`}
+                  className={`flex-1 py-3 rounded-lg text-xs font-bold uppercase tracking-widest transition-all ${view === 'products' ? 'bg-[#d97706] text-white shadow-md' : 'bg-zinc-100 text-zinc-600'}`}
                 >
-                  {t('inventory')}
+                  📦 {t('inventory')}
               </button>
           </div>
         </div>
       </nav>
 
       {/* Main Content Area */}
-      <main className="max-w-7xl mx-auto px-4 md:px-8 py-10 space-y-10">
+      <main className="max-w-7xl mx-auto px-4 md:px-8 py-12 space-y-10">
         
         {/* Page Header */}
-        <div className="flex flex-col md:flex-row justify-between items-end gap-6 pb-6 border-b border-zinc-200">
+        <div className="flex flex-col md:flex-row justify-between items-end gap-6">
           <div>
-            <h1 className="text-3xl font-black text-zinc-900">{view === 'dashboard' ? t('dashboard') : t('inventory')}</h1>
-            <p className="text-sm text-zinc-500 font-medium mt-1">
-              Welcome back. You have <span className="text-[#d97706] font-bold">{pendingOrders.length} new orders</span> today.
+            <h1 className="text-4xl font-bold text-zinc-900">🏢 {view === 'dashboard' ? t('dashboard') : t('inventory')}</h1>
+            <p className="text-base text-zinc-600 font-medium mt-3">
+              Welcome back! You have <span className="text-[#d97706] font-bold text-lg">{pendingOrders.length} pending orders</span> to manage.
             </p>
           </div>
           {view === 'products' && (
             <button 
               onClick={() => { setEditingProduct(null); setIsAdding(true); }}
-              className="bg-zinc-900 hover:bg-[#d97706] text-white px-8 py-4 rounded-xl text-xs font-black uppercase tracking-widest shadow-xl transition-all transform active:scale-95 flex items-center gap-2"
+              className="bg-[#d97706] hover:bg-[#b45309] text-white px-8 py-4 rounded-xl text-xs font-bold uppercase tracking-widest shadow-lg hover:shadow-xl transition-all transform hover:scale-105 active:scale-95 flex items-center gap-2"
             >
-              <span>+</span> Add Product
+              <span>➕</span> Add Product
             </button>
           )}
         </div>
@@ -142,63 +142,75 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ orders, products, feedbacks, on
           <div className="space-y-10 animate-fade-in">
             {/* KPI Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-               <div className="bg-white p-8 rounded-3xl shadow-sm border border-zinc-100 flex flex-col justify-between h-40">
+               <div className="bg-gradient-to-br from-white to-green-50 p-8 rounded-2xl shadow-sm border border-green-100 flex flex-col justify-between h-44 hover:shadow-md transition-all">
                   <div className="flex justify-between items-start">
-                     <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest">{t('stats_revenue')}</p>
-                     <div className="w-8 h-8 rounded-full bg-green-100 text-green-600 flex items-center justify-center">💰</div>
+                     <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest">{t('stats_revenue')}</p>
+                     <div className="w-10 h-10 rounded-xl bg-green-100 text-green-600 flex items-center justify-center text-xl">💰</div>
                   </div>
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-black text-zinc-900">{totalRevenue.toLocaleString()}</span>
-                    <span className="text-sm font-bold text-zinc-400">{t('currency')}</span>
+                  <div>
+                    <div className="flex items-baseline gap-1 mb-1">
+                      <span className="text-5xl font-black text-green-700">{totalRevenue.toLocaleString()}</span>
+                      <span className="text-base font-bold text-zinc-500">{t('currency')}</span>
+                    </div>
+                    <p className="text-xs text-green-600 font-semibold">✓ All-time revenue</p>
                   </div>
                </div>
-               <div className="bg-white p-8 rounded-3xl shadow-sm border border-zinc-100 flex flex-col justify-between h-40">
+               <div className="bg-gradient-to-br from-white to-blue-50 p-8 rounded-2xl shadow-sm border border-blue-100 flex flex-col justify-between h-44 hover:shadow-md transition-all">
                   <div className="flex justify-between items-start">
-                     <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest">{t('stats_orders')}</p>
-                     <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">📦</div>
+                     <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest">{t('stats_orders')}</p>
+                     <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-xl">📦</div>
                   </div>
-                  <span className="text-4xl font-black text-zinc-900">{orders.length}</span>
+                  <div>
+                    <span className="text-5xl font-black text-blue-700 block mb-1">{orders.length}</span>
+                    <p className="text-xs text-blue-600 font-semibold">Total orders received</p>
+                  </div>
                </div>
-               <div className="bg-white p-8 rounded-3xl shadow-sm border border-zinc-100 flex flex-col justify-between h-40">
+               <div className="bg-gradient-to-br from-white to-amber-50 p-8 rounded-2xl shadow-sm border border-amber-100 flex flex-col justify-between h-44 hover:shadow-md transition-all">
                   <div className="flex justify-between items-start">
-                     <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest">{t('stats_pending')}</p>
-                     <div className="w-8 h-8 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center">🔔</div>
+                     <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest">{t('stats_pending')}</p>
+                     <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center text-xl">🔔</div>
                   </div>
-                  <span className={`text-4xl font-black ${pendingOrders.length > 0 ? 'text-[#d97706]' : 'text-zinc-900'}`}>{pendingOrders.length}</span>
+                  <div>
+                    <span className={`text-5xl font-black block mb-1 ${pendingOrders.length > 0 ? 'text-amber-700' : 'text-zinc-900'}`}>{pendingOrders.length}</span>
+                    <p className="text-xs text-amber-600 font-semibold">Awaiting action</p>
+                  </div>
                </div>
-               <div className="bg-white p-8 rounded-3xl shadow-sm border border-zinc-100 flex flex-col justify-between h-40">
+               <div className="bg-gradient-to-br from-white to-purple-50 p-8 rounded-2xl shadow-sm border border-purple-100 flex flex-col justify-between h-44 hover:shadow-md transition-all">
                   <div className="flex justify-between items-start">
-                     <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest">{t('feedback')}</p>
-                     <div className="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center">⭐</div>
+                     <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest">{t('feedback')}</p>
+                     <div className="w-10 h-10 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center text-xl">⭐</div>
                   </div>
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-4xl font-black text-zinc-900">{averageRating.toFixed(1)}</span>
-                    <span className="text-sm font-bold text-zinc-400">/5 ({feedbacks.length})</span>
+                  <div>
+                    <div className="flex items-baseline gap-2 mb-1">
+                      <span className="text-5xl font-black text-purple-700">{averageRating.toFixed(1)}</span>
+                      <span className="text-base font-bold text-zinc-500">/5</span>
+                    </div>
+                    <p className="text-xs text-purple-600 font-semibold">({feedbacks.length} reviews)</p>
                   </div>
                </div>
             </div>
 
             {/* Orders List */}
-            <div className="bg-white rounded-[2rem] shadow-sm border border-zinc-100 overflow-hidden">
-              <div className="p-8 border-b border-zinc-100 flex justify-between items-center">
-                 <h3 className="font-black text-xl text-zinc-900">{t('orders')}</h3>
-                 <span className="text-xs font-bold bg-zinc-100 px-3 py-1 rounded-full text-zinc-500">{orders.length} Total</span>
+            <div className="bg-white rounded-2xl shadow-sm border border-zinc-100 overflow-hidden">
+              <div className="p-8 border-b border-zinc-100 flex justify-between items-center bg-gradient-to-r from-zinc-50 to-white">
+                 <h3 className="font-bold text-2xl text-zinc-900">📋 {t('orders')}</h3>
+                 <span className="text-xs font-bold bg-[#d97706]/10 px-4 py-2 rounded-full text-[#d97706] border border-[#d97706]/20">{orders.length} Total Orders</span>
               </div>
               
               {orders.length === 0 ? (
                 <div className="p-20 text-center">
-                   <div className="text-6xl mb-4 opacity-20">📭</div>
-                   <p className="text-zinc-400 font-bold uppercase tracking-widest text-sm">No orders yet</p>
+                   <div className="text-6xl mb-4 opacity-30">📭</div>
+                   <p className="text-zinc-500 font-bold uppercase tracking-widest text-sm">No orders yet</p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full min-w-[720px] text-left rtl:text-right text-xs sm:text-sm">
-                    <thead className="bg-zinc-50 text-zinc-400 text-[10px] uppercase tracking-widest font-black">
+                    <thead className="bg-gradient-to-r from-zinc-50 to-zinc-100 text-zinc-600 text-[10px] uppercase tracking-widest font-bold">
                       <tr>
-                        <th className="p-6">Order ID</th>
-                        <th className="p-6">Customer</th>
-                        <th className="p-6">Amount</th>
-                        <th className="p-6">Status</th>
+                        <th className="p-6 text-left">Order ID</th>
+                        <th className="p-6 text-left">Customer</th>
+                        <th className="p-6 text-left">Amount</th>
+                        <th className="p-6 text-left">Status</th>
                         <th className="p-6 text-right">Action</th>
                       </tr>
                     </thead>
@@ -239,10 +251,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ orders, products, feedbacks, on
               )}
             </div>
 
-            <div className="bg-white rounded-[2rem] shadow-sm border border-zinc-100 overflow-hidden">
-              <div className="p-8 border-b border-zinc-100 flex justify-between items-center">
-                 <h3 className="font-black text-xl text-zinc-900">{t('latest_feedback')}</h3>
-                 <span className="text-xs font-bold bg-purple-50 px-3 py-1 rounded-full text-purple-700">{feedbacks.length}</span>
+            <div className="bg-white rounded-2xl shadow-sm border border-zinc-100 overflow-hidden">
+              <div className="p-8 border-b border-zinc-100 flex justify-between items-center bg-gradient-to-r from-zinc-50 to-white">
+                 <h3 className="font-bold text-2xl text-zinc-900">💬 {t('latest_feedback')}</h3>
+                 <span className="text-xs font-bold bg-purple-50 px-4 py-2 rounded-full text-purple-700 border border-purple-200">{feedbacks.length} Reviews</span>
               </div>
 
               {feedbacks.length === 0 ? (
@@ -271,14 +283,18 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ orders, products, feedbacks, on
 
         {/* Inventory View */}
         {view === 'products' && (
-           <div className="bg-white rounded-[2rem] shadow-sm border border-zinc-100 overflow-hidden animate-fade-in">
+           <div className="bg-white rounded-2xl shadow-sm border border-zinc-100 overflow-hidden animate-fade-in">
+              <div className="p-8 border-b border-zinc-100 bg-gradient-to-r from-zinc-50 to-white">
+                <h3 className="font-bold text-2xl text-zinc-900">📦 Product Inventory</h3>
+                <p className="text-sm text-zinc-500 mt-1">Manage your products and inventory</p>
+              </div>
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[720px] text-left rtl:text-right text-xs sm:text-sm">
-                   <thead className="bg-zinc-50 text-zinc-400 text-[10px] uppercase tracking-widest font-black">
+                   <thead className="bg-gradient-to-r from-zinc-50 to-zinc-100 text-zinc-600 text-[10px] uppercase tracking-widest font-bold">
                      <tr>
-                       <th className="p-6">Product Item</th>
-                       <th className="p-6">Category</th>
-                       <th className="p-6">Price</th>
+                       <th className="p-6 text-left">Product Item</th>
+                       <th className="p-6 text-left">Category</th>
+                       <th className="p-6 text-left">Price</th>
                        <th className="p-6 text-right">Controls</th>
                      </tr>
                    </thead>
@@ -304,15 +320,15 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ orders, products, feedbacks, on
                              <div className="flex justify-end gap-3">
                                <button 
                                 onClick={() => startEdit(p)} 
-                                className="w-10 h-10 rounded-lg bg-zinc-100 hover:bg-zinc-900 hover:text-white flex items-center justify-center transition-all"
-                                title="Edit"
+                                className="w-10 h-10 rounded-lg bg-blue-50 text-blue-500 hover:bg-blue-500 hover:text-white flex items-center justify-center transition-all hover:shadow-md"
+                                title="Edit Product"
                                >
                                  ✏️
                                </button>
                                <button 
                                 onClick={() => onDeleteProduct(p.id)} 
-                                className="w-10 h-10 rounded-lg bg-red-50 text-red-500 hover:bg-red-500 hover:text-white flex items-center justify-center transition-all"
-                                title="Delete"
+                                className="w-10 h-10 rounded-lg bg-red-50 text-red-500 hover:bg-red-600 hover:text-white flex items-center justify-center transition-all hover:shadow-md"
+                                title="Delete Product"
                                >
                                  🗑️
                                </button>
@@ -330,11 +346,11 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ orders, products, feedbacks, on
       {/* Modal - Modern & Clean */}
       {isAdding && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-zinc-900/80 backdrop-blur-sm transition-opacity" onClick={() => setIsAdding(false)}></div>
-          <div className="bg-white w-full max-w-lg sm:max-w-2xl rounded-[2.5rem] p-6 sm:p-10 relative z-10 shadow-2xl animate-in zoom-in-95 overflow-y-auto max-h-[90vh]">
+          <div className="absolute inset-0 bg-zinc-900/70 backdrop-blur-sm transition-opacity" onClick={() => setIsAdding(false)}></div>
+          <div className="bg-white w-full max-w-lg sm:max-w-2xl rounded-3xl p-6 sm:p-10 relative z-10 shadow-2xl animate-in zoom-in-95 overflow-y-auto max-h-[90vh]">
              <div className="flex justify-between items-center mb-8">
-                <h3 className="text-3xl font-black text-zinc-900">{editingProduct ? 'Edit Product' : 'Add New Item'}</h3>
-                <button onClick={() => setIsAdding(false)} className="w-10 h-10 rounded-full bg-zinc-100 text-zinc-400 hover:bg-zinc-200 font-black flex items-center justify-center transition-colors">✕</button>
+                <h3 className="text-3xl font-bold text-zinc-900">{editingProduct ? '✏️ Edit Product' : '➕ Add New Product'}</h3>
+                <button onClick={() => setIsAdding(false)} className="w-10 h-10 rounded-full bg-zinc-100 text-zinc-500 hover:bg-red-100 hover:text-red-600 font-bold flex items-center justify-center transition-all text-lg">✕</button>
              </div>
 
              <form onSubmit={handleSubmitProduct} className="space-y-6">
@@ -370,9 +386,9 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ orders, products, feedbacks, on
                    <input required className="w-full p-4 bg-zinc-50 border-2 border-zinc-100 rounded-2xl font-mono text-xs outline-none focus:border-[#d97706] focus:bg-white transition-all" value={formData.image} onChange={(e) => setFormData({...formData, image: e.target.value})} />
                 </div>
                 
-                <div className="flex gap-4 pt-6">
-                   <button type="button" onClick={() => setIsAdding(false)} className="flex-1 py-5 bg-zinc-100 text-zinc-500 font-black rounded-2xl uppercase tracking-widest text-xs hover:bg-zinc-200 transition-colors">Cancel</button>
-                   <button type="submit" className="flex-1 py-5 bg-zinc-900 text-white font-black rounded-2xl shadow-xl hover:bg-[#d97706] transition-all uppercase tracking-widest text-xs">{editingProduct ? 'Save Changes' : 'Create Product'}</button>
+                <div className="flex gap-4 pt-8">
+                   <button type="button" onClick={() => setIsAdding(false)} className="flex-1 py-5 bg-zinc-100 text-zinc-700 font-bold rounded-2xl uppercase tracking-widest text-xs hover:bg-zinc-200 transition-all">Cancel</button>
+                   <button type="submit" className="flex-1 py-5 bg-[#d97706] text-white font-bold rounded-2xl shadow-lg hover:bg-[#b45309] hover:shadow-xl transition-all uppercase tracking-widest text-xs">{editingProduct ? '💾 Save Changes' : '➕ Create Product'}</button>
                 </div>
              </form>
           </div>

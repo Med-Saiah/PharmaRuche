@@ -184,8 +184,8 @@ const App: React.FC = () => {
             <Hero t={t} />
 
             {/* About Section - Beekeeping Story, Warm & Organic */}
-            <section id="about" className="py-24 md:py-32 px-6 max-w-7xl mx-auto">
-               <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <section id="about" className="py-20 md:py-32 px-6 md:px-8 bg-white">
+               <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
                  <div className="space-y-8 order-2 lg:order-1">
                    <div className="flex items-center gap-3">
                      <span className="w-12 h-1 bg-[#d97706]"></span>
@@ -233,9 +233,9 @@ const App: React.FC = () => {
             </section>
 
             {/* Products */}
-            <section id="products" className="py-24 px-6 bg-[#fffbf0]">
+            <section id="products" className="py-20 md:py-28 px-6 md:px-8 bg-[#fffbf0]">
               <div className="max-w-7xl mx-auto">
-                <div className="text-center mb-16 space-y-4">
+                <div className="text-center mb-16 md:mb-20 space-y-4">
                   <h2 className="text-4xl md:text-6xl font-black text-zinc-900 font-cairo">{t('products')}</h2>
                   <div className="w-20 h-1.5 bg-[#d97706] mx-auto rounded-full"></div>
                   <p className="text-zinc-500 font-medium max-w-xl mx-auto">{t('hero_subtitle')}</p>
@@ -253,8 +253,8 @@ const App: React.FC = () => {
             <Reviews t={t} feedbacks={feedbacks} lang={lang} />
 
             {/* Professional Contact */}
-            <section id="contact" className="py-32 px-6 bg-white">
-               <div className="max-w-7xl mx-auto bg-zinc-900 rounded-[3rem] p-8 md:p-20 text-white relative overflow-hidden shadow-2xl">
+            <section id="contact" className="py-20 md:py-32 px-6 md:px-8 bg-white">
+               <div className="max-w-7xl mx-auto bg-zinc-900 rounded-[3rem] p-8 md:p-16 lg:p-20 text-white relative overflow-hidden shadow-2xl">
                   {/* Organic Shape Decor */}
                   <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#d97706] opacity-20 rounded-full blur-[100px] -mr-40 -mt-40 pointer-events-none"></div>
                   
