@@ -1,0 +1,19 @@
+/* Base styling to complement Tailwind utility classes. This file exists to satisfy the index.html link and can hold any global overrides you need. */
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  margin: 0;
+  background-color: #ffffff;
+}
+
+a {
+  text-decoration: none;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}

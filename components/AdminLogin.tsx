@@ -1,130 +1,108 @@
+import React, { useState } from "react";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../firebase";
 
-import React, { useState } from 'react';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../firebase';
-
-interface AdminLoginProps {
+type Props = {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
   t: (key: string) => string;
-}
+};
 
-const AdminLogin: React.FC<AdminLoginProps> = ({ isOpen, onClose, onSuccess, t }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+const AdminLogin: React.FC<Props> = ({ isOpen, onClose, onSuccess, t }) => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-  if (!isOpen) {
-    return null;
-  }
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string>("");
 
-  const handleClose = () => {
-    setEmail('');
-    setPassword('');
-    setError('');
-    onClose();
-  };
+  if (!isOpen) return null;
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    setIsLoading(true);
+    setError("");
+    setLoading(true);
 
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      await signInWithEmailAndPassword(auth, email.trim(), password);
       onSuccess();
-      setEmail('');
-      setPassword('');
     } catch (err: any) {
-      console.error('Login error:', err);
-      if (err.code === 'auth/invalid-credential' || err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found') {
-        setError('Invalid email or password');
-      } else if (err.code === 'auth/too-many-requests') {
-        setError('Too many failed attempts. Please try again later.');
+      console.error("Admin login error:", err);
+
+      // Friendly messages
+      const code = err?.code || "";
+      if (code === "auth/invalid-credential" || code === "auth/wrong-password") {
+        setError("Email or password is incorrect.");
+      } else if (code === "auth/user-not-found") {
+        setError("Admin user not found.");
+      } else if (code === "auth/too-many-requests") {
+        setError("Too many attempts. Try again later.");
       } else {
-        setError('Login failed. Please try again.');
+        setError("Login failed. Check console for details.");
       }
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-zinc-900/50 backdrop-blur-sm">
-      <div className="absolute inset-0" onClick={handleClose}></div>
-      <form onSubmit={handleSubmit} className="relative bg-white w-full max-w-md p-10 rounded-3xl shadow-2xl space-y-6 animate-in zoom-in-95">
-        <div className="text-center">
-          <div className="w-24 h-24 bg-gradient-to-br from-[#d97706] to-amber-600 rounded-2xl flex items-center justify-center text-5xl mx-auto mb-6 shadow-lg">
-             🔐
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+      <div className="w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-bold">{t("admin_login")}</h2>
+          <button
+            onClick={onClose}
+            className="rounded-xl px-3 py-1.5 bg-zinc-100 hover:bg-zinc-200"
+            disabled={loading}
+          >
+            ✕
+          </button>
+        </div>
+
+        <form onSubmit={handleLogin} className="space-y-4">
+          <div>
+            <label className="block text-sm font-semibold mb-1">Admin Email</label>
+            <input
+              className="w-full rounded-2xl border border-zinc-200 p-3 focus:outline-none focus:ring-2 focus:ring-[#d97706]"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="admin@email.com"
+              required
+              disabled={loading}
+            />
           </div>
-          <h2 className="text-3xl font-bold text-zinc-900">{t('admin_panel')}</h2>
-          <p className="text-zinc-500 text-sm mt-2 font-semibold uppercase tracking-widest">Secure Access Required</p>
-        </div>
-        
-        <div className="space-y-3">
-          <label className="block text-sm font-bold text-zinc-700 px-1">📧 Email</label>
-          <input 
-            type="email" 
-            autoFocus
-            required
-            className="w-full px-6 py-3 rounded-xl border-2 font-semibold placeholder-zinc-400 outline-none transition-all duration-300 border-zinc-200 bg-zinc-50 focus:border-[#d97706] focus:bg-white focus:ring-2 focus:ring-amber-200"
-            placeholder="admin@pharmaruche.com"
-            value={email}
-            onChange={(e) => { setEmail(e.target.value); setError(''); }}
-            disabled={isLoading}
-          />
-        </div>
 
-        <div className="space-y-3">
-          <label className="block text-sm font-bold text-zinc-700 px-1">🔑 {t('password')}</label>
-          <input 
-            type="password"
-            required
-            className={`w-full px-6 py-3 rounded-xl border-2 font-semibold text-center tracking-widest placeholder-zinc-400 outline-none transition-all duration-300 ${error ? 'border-red-400 bg-red-50 animate-shake focus:border-red-500 focus:ring-2 focus:ring-red-200' : 'border-zinc-200 bg-zinc-50 focus:border-[#d97706] focus:bg-white focus:ring-2 focus:ring-amber-200'}`}
-            placeholder="••••••••"
-            value={password}
-            onChange={(e) => { setPassword(e.target.value); setError(''); }}
-            disabled={isLoading}
-          />
-        </div>
-        
-        {error && (
-          <div className="bg-red-50 border border-red-200 rounded-xl p-3 animate-in slide-in-from-top-2">
-            <p className="text-red-600 text-sm font-semibold flex items-center gap-2">
-              ❌ {error}
-            </p>
+          <div>
+            <label className="block text-sm font-semibold mb-1">Password</label>
+            <input
+              className="w-full rounded-2xl border border-zinc-200 p-3 focus:outline-none focus:ring-2 focus:ring-[#d97706]"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              required
+              disabled={loading}
+            />
           </div>
-        )}
 
-        <button 
-          type="submit" 
-          disabled={isLoading}
-          className="w-full bg-gradient-to-r from-[#d97706] to-amber-600 hover:from-[#c27105] hover:to-amber-700 text-white font-black py-4 rounded-xl shadow-lg transition-all transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
-        >
-          {isLoading ? (
-            <>
-              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-              <span>Signing in...</span>
-            </>
-          ) : (
-            <>
-              <span>{t('login')}</span>
-              <span className="text-xl">🚀</span>
-            </>
-          )}
-        </button>
-      </form>
+          {error ? (
+            <div className="rounded-2xl bg-red-50 text-red-700 p-3 text-sm">{error}</div>
+          ) : null}
 
-      <style>{`
-        @keyframes shake {
-          0%, 100% { transform: translateX(0); }
-          25% { transform: translateX(-5px); }
-          75% { transform: translateX(5px); }
-        }
-        .animate-shake { animation: shake 0.2s ease-in-out 0s 2; }
-      `}</style>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full rounded-2xl bg-[#d97706] text-white font-bold py-3 hover:opacity-90 disabled:opacity-60"
+          >
+            {loading ? "Logging in..." : "Login"}
+          </button>
+        </form>
+
+        <p className="text-xs text-zinc-500 mt-4">
+          Use the admin email/password you created in Firebase Authentication.
+        </p>
+      </div>
     </div>
   );
 };

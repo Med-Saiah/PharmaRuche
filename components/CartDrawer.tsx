@@ -20,13 +20,18 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose, cart, updateQu
   const total = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
 
   const handleSubmit = async () => {
-    if (!isValid || cart.length === 0) return;
+    if (!isValid || cart.length === 0 || loading) return;
 
     setLoading(true);
-    await new Promise(r => setTimeout(r, 1200));
-    onPlaceOrder(formData);
-    setFormData({ name: '', phone: '', wilaya: WILAYAS[15], address: '' });
-    setLoading(false);
+    try {
+      await onPlaceOrder(formData);
+      setFormData({ name: '', phone: '', wilaya: WILAYAS[15], address: '' });
+    } catch (err) {
+      console.error('Order submit failed:', err);
+      alert('Order could not be placed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const isValid =

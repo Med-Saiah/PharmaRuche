@@ -1,13 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { onAuthStateChanged, User } from "firebase/auth";
-import {
-  collection,
-  onSnapshot,
-  orderBy,
-  query,
-  QueryDocumentSnapshot,
-  DocumentData,
-} from "firebase/firestore";
+import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import { auth, db } from "./firebase";
 import { Product, Order, Feedback } from "./types";
 import {
@@ -17,52 +10,18 @@ import {
   addOrder as addOrderToFirestore,
   updateOrderStatus as updateOrderStatusInFirestore,
   addFeedback as addFeedbackToFirestore,
-  seedInitialData,
 } from "./firebaseService";
-import { INITIAL_PRODUCTS } from "./constants";
-
-/**
- * Safe mapper: Firestore doc -> Product
- * - Ensures `id` is present
- * - Avoids UI crash when old/incorrect docs exist
- */
-function mapProductDoc(doc: QueryDocumentSnapshot<DocumentData>): Product {
-  const data = doc.data() as Partial<Product>;
-
-  // Normalize multilingual fields (some docs may have string instead of map)
-  const normalizeI18n = (v: any) => {
-    if (!v) return { ar: "", en: "", fr: "" };
-    if (typeof v === "string") return { ar: v, en: v, fr: v };
-    return {
-      ar: v.ar ?? "",
-      en: v.en ?? "",
-      fr: v.fr ?? "",
-    };
-  };
-
-  return {
-    id: doc.id, // ✅ always use Firestore document id
-    name: normalizeI18n((data as any).name),
-    description: normalizeI18n((data as any).description),
-    category: (data as any).category ?? "Honey",
-    price: typeof (data as any).price === "number" ? (data as any).price : 0,
-    image: (data as any).image ?? "",
-    // If your Product type has more fields, keep them here safely:
-    ...Object.fromEntries(
-      Object.entries(data as any).filter(([key]) => key !== "id")
-    ),
-  } as Product;
-}
-
-function mapOrderDoc(doc: QueryDocumentSnapshot<DocumentData>): Order {
-  return { id: doc.id, ...(doc.data() as any) } as Order;
-}
-
-function mapFeedbackDoc(doc: QueryDocumentSnapshot<DocumentData>): Feedback {
-  return { id: doc.id, ...(doc.data() as any) } as Feedback;
-}
 
 export const useFirebaseData = () => {
+  const adminAllowList = useMemo(
+    () =>
+      (import.meta.env.VITE_ADMIN_EMAILS || "")
+        .split(",")
+        .map((e) => e.trim().toLowerCase())
+        .filter(Boolean),
+    []
+  );
+
   const [products, setProducts] = useState<Product[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
@@ -72,143 +31,90 @@ export const useFirebaseData = () => {
   const [loadingOrders, setLoadingOrders] = useState(false);
   const [loadingFeedbacks, setLoadingFeedbacks] = useState(true);
 
-  const isAdmin = useMemo(() => !!currentUser, [currentUser]);
-  const loading = loadingProducts || loadingFeedbacks || loadingOrders;
+  const isAdmin = useMemo(() => {
+    if (!currentUser) return false;
+    const email = currentUser.email?.toLowerCase();
+    if (!email) return false;
+    if (adminAllowList.length === 0) return false; // safer default: require explicit allowlist
+    return adminAllowList.includes(email);
+  }, [currentUser, adminAllowList]);
+  const loading = loadingProducts || loadingOrders || loadingFeedbacks;
 
-  // -------------------------
   // Auth
-  // -------------------------
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setCurrentUser(user);
-    });
-    return unsubscribe;
+    return onAuthStateChanged(auth, (user) => setCurrentUser(user));
   }, []);
 
-  // -------------------------
   // Products (realtime)
-  // -------------------------
   useEffect(() => {
-    const q = query(collection(db, "products"), orderBy("price", "asc"));
-
-    const unsubscribe = onSnapshot(
+    const q = query(collection(db, "products"), orderBy("createdAt", "desc"));
+    return onSnapshot(
       q,
-      (snapshot) => {
-        const productsData = snapshot.docs.map(mapProductDoc);
-
-        setProducts(productsData);
+      (snap) => {
+        const list = snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) })) as Product[];
+        setProducts(list);
         setLoadingProducts(false);
       },
-      (error) => {
-        console.error("Error loading products:", error);
-
-        // Fallback only if Firestore truly fails (offline / perms)
-        setProducts(INITIAL_PRODUCTS);
+      (err) => {
+        console.error("Products snapshot error:", err);
         setLoadingProducts(false);
       }
     );
-
-    return unsubscribe;
   }, []);
 
-  // -------------------------
   // Orders (realtime, admin only)
-  // -------------------------
   useEffect(() => {
-    if (!currentUser) {
+    if (!isAdmin) {
       setOrders([]);
       setLoadingOrders(false);
       return;
     }
 
     setLoadingOrders(true);
+    const q = query(collection(db, "orders"), orderBy("createdAt", "desc"));
 
-    const q = query(collection(db, "orders"), orderBy("date", "desc"));
-
-    const unsubscribe = onSnapshot(
+    return onSnapshot(
       q,
-      (snapshot) => {
-        setOrders(snapshot.docs.map(mapOrderDoc));
+      (snap) => {
+        const list = snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) })) as Order[];
+        setOrders(list);
         setLoadingOrders(false);
       },
-      (error) => {
-        console.error("Error loading orders:", error);
+      (err) => {
+        console.error("Orders snapshot error:", err);
         setLoadingOrders(false);
       }
     );
+  }, [isAdmin]);
 
-    return unsubscribe;
-  }, [currentUser]);
-
-  // -------------------------
   // Feedbacks (realtime)
-  // -------------------------
   useEffect(() => {
     const q = query(collection(db, "feedbacks"), orderBy("createdAt", "desc"));
-
-    const unsubscribe = onSnapshot(
+    return onSnapshot(
       q,
-      (snapshot) => {
-        setFeedbacks(snapshot.docs.map(mapFeedbackDoc));
+      (snap) => {
+        const list = snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) })) as Feedback[];
+        setFeedbacks(list);
         setLoadingFeedbacks(false);
       },
-      (error) => {
-        console.error("Error loading feedbacks:", error);
+      (err) => {
+        console.error("Feedbacks snapshot error:", err);
         setLoadingFeedbacks(false);
       }
     );
-
-    return unsubscribe;
   }, []);
 
-  // -------------------------
-  // Seed initial products (admin only)
-  // -------------------------
-  useEffect(() => {
-    // Only seed when:
-    // - products finished loading
-    // - admin logged in (rules allow write)
-    // - products is empty
-    if (!loadingProducts && isAdmin && products.length === 0) {
-      console.log("Seeding initial products...");
-      seedInitialData(INITIAL_PRODUCTS).catch((error) => {
-        console.error("Error seeding products:", error);
-      });
-    }
-  }, [loadingProducts, isAdmin, products.length]);
+  // CRUD
+  const addProduct = async (product: Omit<Product, "id">) => addProductToFirestore(product);
+  const updateProduct = async (id: string, product: Partial<Product>) =>
+    updateProductInFirestore(id, product);
+  const deleteProduct = async (id: string) => deleteProductFromFirestore(id);
 
-  // -------------------------
-  // Product operations
-  // -------------------------
-  const addProduct = async (product: Omit<Product, "id">) => {
-    await addProductToFirestore(product);
-  };
+  const addOrder = async (order: Omit<Order, "id">) => addOrderToFirestore(order);
+  const updateOrderStatus = async (id: string, status: Order["status"]) =>
+    updateOrderStatusInFirestore(id, status);
 
-  const updateProduct = async (id: string, product: Partial<Product>) => {
-    await updateProductInFirestore(id, product);
-  };
-
-  const deleteProduct = async (id: string) => {
-    await deleteProductFromFirestore(id);
-  };
-
-  // -------------------------
-  // Order operations
-  // -------------------------
-  const addOrder = async (order: Omit<Order, "id">) => {
-    return await addOrderToFirestore(order);
-  };
-
-  const updateOrderStatus = async (id: string, status: Order["status"]) => {
-    await updateOrderStatusInFirestore(id, status);
-  };
-
-  // -------------------------
-  // Feedback operations
-  // -------------------------
-  const addFeedback = async (feedback: Omit<Feedback, "id">) => {
-    await addFeedbackToFirestore(feedback);
-  };
+  const addFeedback = async (feedback: Omit<Feedback, "id">) => addFeedbackToFirestore(feedback);
 
   return {
     products,
