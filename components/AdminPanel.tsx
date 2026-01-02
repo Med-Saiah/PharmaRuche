@@ -192,7 +192,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ orders, products, feedbacks, on
                 </div>
               ) : (
                 <div className="overflow-x-auto">
-                  <table className="w-full text-left rtl:text-right">
+                  <table className="w-full min-w-[720px] text-left rtl:text-right text-xs sm:text-sm">
                     <thead className="bg-zinc-50 text-zinc-400 text-[10px] uppercase tracking-widest font-black">
                       <tr>
                         <th className="p-6">Order ID</th>
@@ -273,7 +273,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ orders, products, feedbacks, on
         {view === 'products' && (
            <div className="bg-white rounded-[2rem] shadow-sm border border-zinc-100 overflow-hidden animate-fade-in">
               <div className="overflow-x-auto">
-                <table className="w-full text-left rtl:text-right">
+                <table className="w-full min-w-[720px] text-left rtl:text-right text-xs sm:text-sm">
                    <thead className="bg-zinc-50 text-zinc-400 text-[10px] uppercase tracking-widest font-black">
                      <tr>
                        <th className="p-6">Product Item</th>
@@ -331,12 +331,12 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ orders, products, feedbacks, on
       {isAdding && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-zinc-900/80 backdrop-blur-sm transition-opacity" onClick={() => setIsAdding(false)}></div>
-          <div className="bg-white w-full max-w-2xl rounded-[2.5rem] p-10 relative z-10 shadow-2xl animate-in zoom-in-95 overflow-y-auto max-h-[90vh]">
+          <div className="bg-white w-full max-w-lg sm:max-w-2xl rounded-[2.5rem] p-6 sm:p-10 relative z-10 shadow-2xl animate-in zoom-in-95 overflow-y-auto max-h-[90vh]">
              <div className="flex justify-between items-center mb-8">
                 <h3 className="text-3xl font-black text-zinc-900">{editingProduct ? 'Edit Product' : 'Add New Item'}</h3>
                 <button onClick={() => setIsAdding(false)} className="w-10 h-10 rounded-full bg-zinc-100 text-zinc-400 hover:bg-zinc-200 font-black flex items-center justify-center transition-colors">✕</button>
              </div>
-             
+
              <form onSubmit={handleSubmitProduct} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                    <div className="space-y-2">
