@@ -15,10 +15,12 @@ const Hero: React.FC<HeroProps> = ({ t }) => {
           className="w-full h-full object-cover brightness-[0.55]"
         />
         {/* Warm Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/30 to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/30 to-amber-900/10"></div>
+        <div className="absolute -left-10 top-10 w-72 h-72 rounded-full bg-amber-500/20 blur-3xl" />
+        <div className="absolute right-0 bottom-10 w-80 h-80 rounded-full bg-amber-300/20 blur-3xl" />
       </div>
 
-      <div className="relative z-10 px-6 w-full max-w-7xl grid grid-cols-1 lg:grid-cols-2 gap-10 items-center text-white">
+      <div className="relative z-10 px-6 w-full max-w-7xl grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-12 items-center text-white">
         <div className="space-y-6 max-w-2xl">
           <div className="flex items-center gap-3">
             <img src="/brand-logo.svg" alt="Pharma Ruche" className="w-40 drop-shadow-lg" />
@@ -57,17 +59,36 @@ const Hero: React.FC<HeroProps> = ({ t }) => {
         </div>
 
         <div className="hidden lg:flex justify-end">
-          <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-[28px] p-6 shadow-2xl w-[360px] space-y-4">
-            <div className="h-64 rounded-[22px] overflow-hidden shadow-xl ring-4 ring-amber-200/40">
-              <img
-                src="https://images.unsplash.com/photo-1464965911861-746a04b4bca6?auto=format&fit=crop&q=80&w=900"
-                alt="Pharma Ruche honey jars"
-                className="w-full h-full object-cover"
-              />
+          <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-[28px] p-8 shadow-2xl w-full max-w-[420px] space-y-6">
+            <div className="flex items-center gap-3">
+              <span className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-zinc-900 text-xl font-black shadow-lg shadow-amber-500/30">
+                🍯
+              </span>
+              <div>
+                <p className="text-xs uppercase tracking-[0.3em] text-amber-100 font-black">Nectar Pur</p>
+                <p className="text-lg font-black text-white">عسل خام بلا أي إضافات</p>
+              </div>
             </div>
-            <div className="flex items-center justify-between">
-              <p className="text-amber-100 font-black text-lg">100% Natural</p>
-              <p className="text-xs uppercase tracking-[0.3em] text-white/80">Eucalyptus · Sidr</p>
+
+            <div className="grid grid-cols-1 gap-4">
+              {[{
+                title: 'Harvested With Care',
+                subtitle: 'موسمي و مصدر من خلايا موثوقة'
+              }, {
+                title: 'Cold-Filtered Quality',
+                subtitle: 'الحفاظ على الإنزيمات و الفوائد الطبيعية'
+              }, {
+                title: 'Trusted by Families',
+                subtitle: 'توصل سريع مع خدمة عملاء حاضرة دائمًا'
+              }].map((item, idx) => (
+                <div key={idx} className="flex items-start gap-4 p-4 rounded-2xl bg-white/5 border border-white/10 shadow-inner shadow-black/20">
+                  <span className="mt-1 w-3 h-3 rounded-full bg-amber-400 shadow shadow-amber-300/60" />
+                  <div>
+                    <p className="text-white font-black text-lg leading-tight">{item.title}</p>
+                    <p className="text-amber-100/90 font-semibold">{item.subtitle}</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
