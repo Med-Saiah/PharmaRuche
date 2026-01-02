@@ -7,13 +7,13 @@ interface NavbarProps {
   setLang: (l: Language) => void;
   cartCount: number;
   onCartClick: () => void;
-  isAdmin: boolean;
   onAdminClick: () => void;
   t: (key: string) => string;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ lang, setLang, cartCount, onCartClick, t }) => {
+const Navbar: React.FC<NavbarProps> = ({ lang, setLang, cartCount, onCartClick, onAdminClick, t }) => {
   const [scrolled, setScrolled] = useState(false);
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -21,8 +21,15 @@ const Navbar: React.FC<NavbarProps> = ({ lang, setLang, cartCount, onCartClick, 
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const links = [
+    { href: '#home', label: t('home') },
+    { href: '#products', label: t('products') },
+    { href: '#reviews', label: t('reviews') },
+    { href: '#contact', label: t('contact') },
+  ];
+
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-500 border-b ${scrolled ? 'bg-white/95 backdrop-blur-xl border-zinc-200/60 py-3 shadow-sm' : 'bg-transparent border-transparent py-6'}`}>
+    <nav dir="ltr" className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-500 border-b ${scrolled ? 'bg-white/95 backdrop-blur-xl border-zinc-200/60 py-3 shadow-sm' : 'bg-transparent border-transparent py-4 md:py-6'}`}>
       <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
         
         {/* Brand */}
@@ -30,19 +37,18 @@ const Navbar: React.FC<NavbarProps> = ({ lang, setLang, cartCount, onCartClick, 
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
           className="flex items-center gap-3 group focus:outline-none"
         >
-          <div className="w-10 h-10 bg-zinc-900 rounded-lg flex items-center justify-center shadow-lg group-hover:bg-[#d97706] transition-colors">
-            <svg viewBox="0 0 24 24" className="w-6 h-6 text-white" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-            </svg>
-          </div>
-          <div className="text-left rtl:text-right">
-            <h1 className={`text-lg font-black tracking-tight leading-none ${scrolled ? 'text-zinc-900' : 'text-zinc-900 md:text-white'}`}>
-              {t('shop_name')}
-            </h1>
-          </div>
+          <img src="/brand-logo.svg" alt="Pharma Ruche" className="w-36 md:w-44 drop-shadow-lg" />
         </button>
 
-        <div className="flex items-center gap-4">
+        <div className="hidden lg:flex items-center gap-8">
+          {links.map(link => (
+            <a key={link.href} href={link.href} className={`text-sm font-black uppercase tracking-[0.2em] transition-colors ${scrolled ? 'text-zinc-600 hover:text-zinc-900' : 'text-white/80 hover:text-white'}`}>
+              {link.label}
+            </a>
+          ))}
+        </div>
+
+        <div className="flex items-center gap-3">
           {/* Language Switcher */}
           <div className="hidden md:flex bg-zinc-100/50 backdrop-blur-md rounded-lg p-1 border border-white/10">
             {(['ar', 'fr', 'en'] as Language[]).map(l => (
@@ -57,7 +63,7 @@ const Navbar: React.FC<NavbarProps> = ({ lang, setLang, cartCount, onCartClick, 
           </div>
 
           {/* Cart Button */}
-          <button 
+          <button
             onClick={onCartClick}
             className="group relative flex items-center gap-3 px-5 py-2.5 bg-zinc-900 text-white rounded-xl hover:bg-[#d97706] transition-all shadow-lg active:scale-95"
           >
@@ -71,8 +77,40 @@ const Navbar: React.FC<NavbarProps> = ({ lang, setLang, cartCount, onCartClick, 
               )}
             </div>
           </button>
+
+          <button
+            onClick={onAdminClick}
+            className="hidden md:inline-flex items-center justify-center w-11 h-11 rounded-xl border-2 border-white/30 text-white hover:bg-white hover:text-zinc-900 transition-colors"
+            title={t('admin_access')}
+          >
+            🔒
+          </button>
+
+          <button
+            onClick={() => setOpen(!open)}
+            className="lg:hidden w-11 h-11 rounded-xl border-2 border-white/40 text-white flex items-center justify-center"
+          >
+            {open ? '✕' : '☰'}
+          </button>
         </div>
       </div>
+
+      {open && (
+        <div className="lg:hidden bg-white/95 backdrop-blur-xl border-t border-zinc-200/60 shadow-xl">
+          <div className="max-w-7xl mx-auto px-6 py-4 space-y-3">
+            {links.map(link => (
+              <a
+                key={link.href}
+                href={link.href}
+                onClick={() => setOpen(false)}
+                className="block text-zinc-900 font-black uppercase tracking-[0.2em]"
+              >
+                {link.label}
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
     </nav>
   );
 };
