@@ -87,5 +87,15 @@ export const TRANSLATIONS: TranslationStrings = {
   close: { ar: 'إغلاق', fr: 'Fermer', en: 'Close' },
   admin_access: { ar: 'إدارة المتجر', fr: 'Administration', en: 'Admin' },
   inventory: { ar: 'المخزون', fr: 'Stock', en: 'Inventory' },
-  dashboard: { ar: 'نظرة عامة', fr: 'Vue d\'ensemble', en: 'Overview' }
+  dashboard: { ar: 'نظرة عامة', fr: 'Vue d\'ensemble', en: 'Overview' },
+  feedback: { ar: 'آراء العملاء', fr: 'Avis clients', en: 'Customer Feedback' },
+  leave_feedback: { ar: 'اترك رأيك', fr: 'Laisser un avis', en: 'Leave Feedback' },
+  rating: { ar: 'التقييم', fr: 'Note', en: 'Rating' },
+  comment: { ar: 'تعليقك', fr: 'Votre message', en: 'Your message' },
+  submit_feedback: { ar: 'إرسال التقييم', fr: 'Envoyer', en: 'Send Feedback' },
+  thank_feedback: { ar: 'شكراً لمشاركتك رأيك!', fr: 'Merci pour votre avis !', en: 'Thanks for sharing your feedback!' },
+  latest_feedback: { ar: 'آخر الآراء', fr: 'Derniers avis', en: 'Latest feedback' },
+  show_more: { ar: 'عرض المزيد', fr: 'Voir plus', en: 'Show more' },
+  show_less: { ar: 'عرض أقل', fr: 'Voir moins', en: 'Show less' },
+  feedback_prompt: { ar: 'كيف كانت تجربتك مع طلبيتنا الأخيرة؟', fr: 'Comment s\'est passée votre dernière commande ?', en: 'How was your last order with us?' }
 };

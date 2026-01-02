@@ -1,9 +1,10 @@
 
 import React, { useState } from 'react';
-import { Order, Product, Language } from '../types';
+import { Order, Product, Language, Feedback } from '../types';
 
 interface AdminPanelProps {
   orders: Order[];
+  feedbacks: Feedback[];
   products: Product[];
   onDeleteProduct: (id: string) => void;
   onAddProduct: (p: Product) => void;
@@ -13,7 +14,7 @@ interface AdminPanelProps {
   lang: Language;
 }
 
-const AdminPanel: React.FC<AdminPanelProps> = ({ orders, products, onDeleteProduct, onAddProduct, onUpdateStatus, onLogout, t, lang }) => {
+const AdminPanel: React.FC<AdminPanelProps> = ({ orders, products, feedbacks, onDeleteProduct, onAddProduct, onUpdateStatus, onLogout, t, lang }) => {
   const [view, setView] = useState<'dashboard' | 'products'>('dashboard');
   const [isAdding, setIsAdding] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -53,6 +54,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ orders, products, onDeleteProdu
 
   const totalRevenue = orders.reduce((sum, order) => sum + (order.status !== 'cancelled' ? order.total : 0), 0);
   const pendingOrders = orders.filter(o => o.status === 'pending');
+  const averageRating = feedbacks.length === 0 ? 0 : (feedbacks.reduce((sum, fb) => sum + fb.rating, 0) / feedbacks.length);
 
   return (
     <div className="min-h-screen bg-[#f3f4f6] font-montserrat text-zinc-900 pb-20">
@@ -139,7 +141,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ orders, products, onDeleteProdu
         {view === 'dashboard' && (
           <div className="space-y-10 animate-fade-in">
             {/* KPI Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
                <div className="bg-white p-8 rounded-3xl shadow-sm border border-zinc-100 flex flex-col justify-between h-40">
                   <div className="flex justify-between items-start">
                      <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest">{t('stats_revenue')}</p>
@@ -163,6 +165,16 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ orders, products, onDeleteProdu
                      <div className="w-8 h-8 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center">🔔</div>
                   </div>
                   <span className={`text-4xl font-black ${pendingOrders.length > 0 ? 'text-[#d97706]' : 'text-zinc-900'}`}>{pendingOrders.length}</span>
+               </div>
+               <div className="bg-white p-8 rounded-3xl shadow-sm border border-zinc-100 flex flex-col justify-between h-40">
+                  <div className="flex justify-between items-start">
+                     <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest">{t('feedback')}</p>
+                     <div className="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center">⭐</div>
+                  </div>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-4xl font-black text-zinc-900">{averageRating.toFixed(1)}</span>
+                    <span className="text-sm font-bold text-zinc-400">/5 ({feedbacks.length})</span>
+                  </div>
                </div>
             </div>
 
@@ -223,6 +235,34 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ orders, products, onDeleteProdu
                        ))}
                     </tbody>
                   </table>
+                </div>
+              )}
+            </div>
+
+            <div className="bg-white rounded-[2rem] shadow-sm border border-zinc-100 overflow-hidden">
+              <div className="p-8 border-b border-zinc-100 flex justify-between items-center">
+                 <h3 className="font-black text-xl text-zinc-900">{t('latest_feedback')}</h3>
+                 <span className="text-xs font-bold bg-purple-50 px-3 py-1 rounded-full text-purple-700">{feedbacks.length}</span>
+              </div>
+
+              {feedbacks.length === 0 ? (
+                <div className="p-12 text-center text-zinc-400 font-bold uppercase tracking-widest text-sm">No feedback yet</div>
+              ) : (
+                <div className="divide-y divide-zinc-100">
+                  {feedbacks.slice(0, 6).map((fb) => (
+                    <div key={fb.id} className="p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                      <div>
+                        <p className="text-sm font-black text-zinc-900">{fb.customerName}</p>
+                        <p className="text-xs text-zinc-400">#{fb.orderId} · {new Date(fb.createdAt).toLocaleDateString()}</p>
+                        <p className="text-zinc-600 mt-2 leading-relaxed max-w-2xl">{fb.comment}</p>
+                      </div>
+                      <div className="flex items-center gap-1 text-amber-500 text-lg font-black">
+                        {[...Array(5)].map((_, idx) => (
+                          <span key={idx}>{idx < fb.rating ? '★' : '☆'}</span>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               )}
             </div>

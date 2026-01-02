@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Language, Product, CartItem, Order } from './types';
+import { Language, Product, CartItem, Order, Feedback } from './types';
 import { TRANSLATIONS, INITIAL_PRODUCTS } from './constants';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
@@ -21,9 +21,11 @@ const App: React.FC = () => {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [orders, setOrders] = useState<Order[]>([]);
+  const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
   const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isSuccessOpen, setIsSuccessOpen] = useState(false);
+  const [recentOrder, setRecentOrder] = useState<Order | null>(null);
   const [hydrated, setHydrated] = useState(false);
 
   // Load Data
@@ -32,9 +34,11 @@ const App: React.FC = () => {
       const savedCart = localStorage.getItem('pharma_cart');
       const savedOrders = localStorage.getItem('pharma_orders');
       const savedProducts = localStorage.getItem('pharma_products');
+      const savedFeedbacks = localStorage.getItem('pharma_feedbacks');
       if (savedCart) setCart(JSON.parse(savedCart));
       if (savedOrders) setOrders(JSON.parse(savedOrders));
       if (savedProducts) setProducts(JSON.parse(savedProducts));
+      if (savedFeedbacks) setFeedbacks(JSON.parse(savedFeedbacks));
     } catch (e) {
       console.error("Storage Error", e);
     } finally {
@@ -48,7 +52,8 @@ const App: React.FC = () => {
     localStorage.setItem('pharma_cart', JSON.stringify(cart));
     localStorage.setItem('pharma_orders', JSON.stringify(orders));
     localStorage.setItem('pharma_products', JSON.stringify(products));
-  }, [cart, orders, products, hydrated]);
+    localStorage.setItem('pharma_feedbacks', JSON.stringify(feedbacks));
+  }, [cart, orders, products, feedbacks, hydrated]);
 
   // RTL/LTR Handling
   useEffect(() => {
@@ -104,9 +109,29 @@ const App: React.FC = () => {
       date: new Date().toLocaleDateString()
     };
     setOrders(prev => [newOrder, ...prev]);
+    setRecentOrder(newOrder);
     setCart([]); // Clear cart
     setIsCartOpen(false);
     setIsSuccessOpen(true);
+  };
+
+  const submitFeedback = (rating: number, comment: string) => {
+    if (!recentOrder) return;
+
+    const trimmed = comment.trim();
+    const feedback: Feedback = {
+      id: `FB-${Math.random().toString(36).substr(2, 6).toUpperCase()}`,
+      orderId: recentOrder.id,
+      customerName: recentOrder.customerName,
+      rating,
+      comment: trimmed || t('thank_feedback'),
+      createdAt: new Date().toISOString()
+    };
+
+    setFeedbacks(prev => [feedback, ...prev]);
+    setOrders(prev => prev.map(o => o.id === recentOrder.id ? { ...o, feedback } : o));
+    setRecentOrder(null);
+    setIsSuccessOpen(false);
   };
 
   const deleteProduct = (id: string) => {
@@ -133,10 +158,11 @@ const App: React.FC = () => {
     <div className={`${lang === 'ar' ? 'font-cairo' : 'font-montserrat'} min-h-screen text-zinc-900 transition-colors selection:bg-[#d97706] selection:text-white`}>
       
       {isAdmin ? (
-        <AdminPanel 
-          orders={orders} 
-          products={products} 
-          onDeleteProduct={deleteProduct} 
+        <AdminPanel
+          orders={orders}
+          feedbacks={feedbacks}
+          products={products}
+          onDeleteProduct={deleteProduct}
           onAddProduct={addOrUpdateProduct}
           onUpdateStatus={updateOrderStatus}
           t={t}
@@ -145,12 +171,11 @@ const App: React.FC = () => {
         />
       ) : (
         <>
-          <Navbar 
-            lang={lang} 
-            setLang={setLang} 
-            cartCount={cart.reduce((a, b) => a + b.quantity, 0)} 
+          <Navbar
+            lang={lang}
+            setLang={setLang}
+            cartCount={cart.reduce((a, b) => a + b.quantity, 0)}
             onCartClick={() => setIsCartOpen(true)}
-            isAdmin={isAdmin}
             onAdminClick={() => setIsLoginOpen(true)}
             t={t}
           />
@@ -225,7 +250,7 @@ const App: React.FC = () => {
               </div>
             </section>
             
-            <Reviews t={t} />
+            <Reviews t={t} feedbacks={feedbacks} lang={lang} />
 
             {/* Professional Contact */}
             <section id="contact" className="py-32 px-6 bg-white">
@@ -296,10 +321,13 @@ const App: React.FC = () => {
             t={t}
           />
 
-          <OrderSuccessModal 
-            isOpen={isSuccessOpen} 
-            onClose={() => setIsSuccessOpen(false)} 
-            t={t} 
+          <OrderSuccessModal
+            isOpen={isSuccessOpen}
+            onClose={() => { setIsSuccessOpen(false); setRecentOrder(null); }}
+            onSubmitFeedback={submitFeedback}
+            order={recentOrder}
+            lang={lang}
+            t={t}
           />
         </>
       )}

@@ -24,8 +24,18 @@ export interface Order {
   total: number;
   status: 'pending' | 'delivered' | 'cancelled';
   date: string;
+  feedback?: Feedback;
 }
 
 export interface TranslationStrings {
   [key: string]: { [key in Language]: string };
+}
+
+export interface Feedback {
+  id: string;
+  orderId: string;
+  customerName: string;
+  rating: number;
+  comment: string;
+  createdAt: string;
 }
